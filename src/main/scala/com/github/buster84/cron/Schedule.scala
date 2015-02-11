@@ -1,7 +1,8 @@
 package com.github.buster84.cron
 import org.joda.time._
+import scala.annotation.tailrec
 
-case class Schedule( cronExpression: String ) {
+case class Schedule( cronExpression: String, timezone: DateTimeZone = DateTimeZone.UTC ) {
   sealed trait TimeType
   case object Min extends TimeType
   case object Hour extends TimeType
@@ -11,9 +12,11 @@ case class Schedule( cronExpression: String ) {
   private val cron = CronParser( cronExpression ).get
 
   def getNextAfter( time: DateTime ): DateTime = {
-    getNextAfterRec( time.plusMinutes( 1 ) ) // Plus one minute because same datetime is not good for this method because of "AFTER"
+    val originTimeZone = time.getZone()
+    getNextAfterRec( time.withZone(timezone).plusMinutes( 1 ) ).withZone( originTimeZone ) // Plus one minute because same datetime is not good for this method because of "AFTER"
   }
 
+  @tailrec
   private def getNextAfterRec( time: DateTime ): DateTime = {
     if( !isSatisfiedMinute( time ) ){
       getNextAfterRec( time.plusMinutes( 1 ) )
