@@ -3,11 +3,6 @@ import org.joda.time._
 import scala.annotation.tailrec
 
 case class Schedule( cronExpression: String, timezone: DateTimeZone = DateTimeZone.UTC ) {
-  sealed trait TimeType
-  case object Min extends TimeType
-  case object Hour extends TimeType
-  case object Day extends TimeType
-  case object Month extends TimeType
 
   private val cron = CronParser( cronExpression ).get
 
@@ -31,38 +26,40 @@ case class Schedule( cronExpression: String, timezone: DateTimeZone = DateTimeZo
     }
   }
 
-  private def isSatisfiedNumber( num:Int, timing: Timing ): Boolean = {
+  private def isSatisfiedNumber( timing: Timing ): (Int) => Boolean = {
     timing match {
       case Asta =>
-        true
+        { num: Int => true }
       case TimingSeq(list) =>
-        list.contains(num)
+        { num: Int => list.contains(num) }
       case Bounds(from, to) =>
-        num >= from && num <= to
+        { num: Int => num >= from && num <= to }
       case AstaPar(par) =>
-        num % par == 0
+        { num: Int => num % par == 0 }
       case Fraction(top, bottom) =>
-        num % bottom == top
+        { num: Int => num % bottom == top }
     }
   }
+  private val isSatisfiedMinuteNumber : (Int) => Boolean = isSatisfiedNumber( cron.min )
+  private val isSatisfiedHourNumber : (Int) => Boolean = isSatisfiedNumber( cron.hour )
+  private val isSatisfiedDayNumber : (Int) => Boolean = isSatisfiedNumber( cron.day )
+  private val isSatisfiedMonthNumber : (Int) => Boolean = isSatisfiedNumber( cron.month )
+  private val isSatisfiedWeekNumber : (Int) => Boolean = isSatisfiedNumber( cron.dayOfWeek )
 
-  private def isSatisfiedAll( time: DateTime ): Boolean = {
-    isSatisfiedMinute( time ) && isSatisfiedHour( time ) && isSatisfiedDay( time ) && isSatisfiedMonth( time )
-  }
   private def isSatisfiedMinute(time: DateTime): Boolean = {
-    isSatisfiedNumber( time.getMinuteOfHour(), cron.min )
+    isSatisfiedMinuteNumber( time.getMinuteOfHour() )
   }
 
   private def isSatisfiedHour(time: DateTime): Boolean = {
-    isSatisfiedNumber( time.getHourOfDay(), cron.hour )
+    isSatisfiedHourNumber(time.getHourOfDay())
   }
   private def isSatisfiedDay(time: DateTime): Boolean = {
-    isSatisfiedNumber( time.getDayOfMonth, cron.day )
+    isSatisfiedDayNumber(time.getDayOfMonth)
   }
   private def isSatisfiedMonth(time: DateTime): Boolean = {
-    isSatisfiedNumber( time.getMonthOfYear, cron.month )
+    isSatisfiedMonthNumber(time.getMonthOfYear)
   }
   private def isSatisfiedWeek( time: DateTime ): Boolean = {
-    isSatisfiedNumber( time.getDayOfWeek, cron.dayOfWeek )
+    isSatisfiedWeekNumber(time.getDayOfWeek)
   }
 }
