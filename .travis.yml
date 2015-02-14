@@ -1,0 +1,15 @@
+# See http://about.travis-ci.org/docs/user/build-configuration/
+language: scala
+scala:
+   - 2.10.4
+   - 2.11.5
+branches:
+  only:
+    - master
+notifications:
+  email:
+    recipients:
+      - yasuki111+scala-cron@gmail.com
+jdk:
+  - oraclejdk7
+  - oraclejdk8
