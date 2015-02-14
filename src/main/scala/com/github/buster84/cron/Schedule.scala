@@ -16,11 +16,11 @@ case class Schedule( cronExpression: String, timezone: DateTimeZone = DateTimeZo
     if( !isSatisfiedMinute( time ) ){
       getNextAfterRec( time.plusMinutes( 1 ) )
     } else if ( !isSatisfiedHour( time ) ) {
-      getNextAfterRec( time.plusHours( 1 ).withMinuteOfHour(0) )
+      getNextAfterRec( time.plusHours( 1 ).withMinuteOfHour(minMinuteNumber) )
     } else if ( !isSatisfiedDay( time ) || !isSatisfiedWeek( time ) ) {
-      getNextAfterRec( time.plusDays( 1 ).withHourOfDay( 0 ).withMinuteOfHour( 0 ) )
+      getNextAfterRec( time.plusDays( 1 ).withHourOfDay( minHourNumber ).withMinuteOfHour( minMinuteNumber ) )
     } else if ( !isSatisfiedMonth( time ) ){
-      getNextAfterRec( time.plusMonths( 1 ).withDayOfMonth( 1 ).withHourOfDay( 0 ).withMinuteOfHour( 0 ) )
+      getNextAfterRec( time.plusMonths( 1 ).withDayOfMonth( 1 ).withHourOfDay( minHourNumber ).withMinuteOfHour( minMinuteNumber ) )
     } else {
       time
     }
@@ -45,6 +45,28 @@ case class Schedule( cronExpression: String, timezone: DateTimeZone = DateTimeZo
   private val isSatisfiedDayNumber : (Int) => Boolean = isSatisfiedNumber( cron.day )
   private val isSatisfiedMonthNumber : (Int) => Boolean = isSatisfiedNumber( cron.month )
   private val isSatisfiedWeekNumber : (Int) => Boolean = isSatisfiedNumber( cron.dayOfWeek )
+
+  private val minMinuteNumber = {
+    var num = 0
+    while( !isSatisfiedMinuteNumber( num ) ){
+      num = num +1
+    }
+    num
+  }
+  private val minHourNumber   = {
+    var num = 0
+    while( !isSatisfiedHourNumber( num ) ){
+      num = num +1
+    }
+    num
+  }
+  private val minDayNumber    = {
+    var num = 1
+    while( !isSatisfiedDayNumber( num ) ){
+      num = num +1
+    }
+    num
+  }
 
   private def isSatisfiedMinute(time: DateTime): Boolean = {
     isSatisfiedMinuteNumber( time.getMinuteOfHour() )
