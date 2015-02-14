@@ -7,7 +7,13 @@ scalaVersion := "2.11.5"
 // Change this to another test framework if you prefer
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.6" % "test"
 
-libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.3"
+libraryDependencies <++= scalaVersion {sv =>
+  if ( sv.startsWith( "2.11" ) ){
+    Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.3")
+  } else {
+    Seq()
+  }
+}
 
 
 // joda time
