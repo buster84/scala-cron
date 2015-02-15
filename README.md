@@ -21,3 +21,6 @@ scala> schedule.getNextAfter(new DateTime( 2015, 2, 11, 2, 0, 0 ))
 res2: org.joda.time.DateTime = 2015-02-11T10:00:00.000+09:00
 
 ```
+
+## License
+[Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
