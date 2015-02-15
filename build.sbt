@@ -15,6 +15,7 @@ libraryDependencies <++= scalaVersion {sv =>
   }
 }
 
+releaseSettings
 
 // joda time
 libraryDependencies += "joda-time" % "joda-time" % "2.3"
