@@ -3,7 +3,10 @@
 The scala-cron can parse cron synstax string and compute nex time schedule.
 
 ## Installation
-TODO
+build.sbt
+```scala
+libraryDependencies += "com.github.buster84" %% "scala-cron" % "1.0.0"
+```
 
 ## Usage
 ```
